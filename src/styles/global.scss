@@ -1,0 +1,18 @@
+// Custom variables
+@use "variables" as *;
+
+// Bootstrap
+@import "bootstrap/scss/bootstrap";
+
+// Globals
+*,
+*::before,
+*::after {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+}
