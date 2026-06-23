@@ -1,0 +1,32 @@
+{
+  "users": [
+    { "id": 1, "username": "admin-usr", "role": "ADMIN" },
+    { "id": 2, "username": "default-usr", "role": "DEFAULT" }
+  ],
+  "categories": [
+    { "id": 1, "label": "NLP", "color": "#FF0000" },
+    { "id": 2, "label": "Computer Vision", "color": "#0000FF" }
+  ],
+  "aimodels": [
+    {
+      "id": 1,
+      "categoryId": 1,
+      "name": "Gemini",
+      "version": "3.1 Pro",
+      "description": "LLM model designed to read, understand, and generate human language.",
+      "accuracy": 94.5,
+      "creator": "Google",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "categoryId": 2,
+      "name": "YOLO",
+      "version": "11.0",
+      "description": "Real-time object detection AI model.",
+      "accuracy": 89.2,
+      "creator": "Washington University",
+      "isActive": true
+    }
+  ]
+}
