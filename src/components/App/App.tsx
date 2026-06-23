@@ -1,17 +1,9 @@
+import { RouterProvider } from "react-router-dom";
+import router from "@/router/router";
 import "./App.scss";
 
 function App() {
-  return (
-    <>
-      <h1 className="app-title">
-        Epicode | Computer Engineering & Artificial Intelligence
-      </h1>
-      <h1 className="text-danger">
-        Frontend Project | Vite + React + Typescript
-      </h1>
-      <h1>App Landing Page</h1>
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
