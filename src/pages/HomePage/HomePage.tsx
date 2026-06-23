@@ -1,5 +1,14 @@
 import { Link } from "react-router-dom";
 
+import {
+  Home,
+  User,
+  LockKeyhole,
+  Settings,
+  Search,
+  GlobeOff,
+} from "lucide-react";
+
 function HomePage() {
   return (
     <div>
@@ -13,22 +22,52 @@ function HomePage() {
       <nav className="navbar navbar-expand bg-primary px-4">
         <div className="navbar-nav gap-3">
           <Link className="nav-link" to="/">
-            Home Page
+            <div className="d-flex justify-content-center align-items-center gap-2">
+              <div>
+                <Home size={24} />
+              </div>
+              <div>Home Page</div>
+            </div>
           </Link>
           <Link className="nav-link" to="/login">
-            Login Page
+            <div className="d-flex justify-content-center align-items-center gap-2">
+              <div>
+                <User size={24} />
+              </div>
+              <div>Login Page</div>
+            </div>
           </Link>
           <Link className="nav-link" to="/admin">
-            Admin Page
+            <div className="d-flex justify-content-center align-items-center gap-2">
+              <div>
+                <LockKeyhole size={24} />
+              </div>
+              <div>Admin Page</div>
+            </div>
           </Link>
           <Link className="nav-link" to="/setting">
-            Setting Page
+            <div className="d-flex justify-content-center align-items-center gap-2">
+              <div>
+                <Settings size={24} />
+              </div>
+              <div>Settings Page</div>
+            </div>
           </Link>
           <Link className="nav-link" to="/detail/1">
-            Detail Page - Id: 1
+            <div className="d-flex justify-content-center align-items-center gap-2">
+              <div>
+                <Search size={24} />
+              </div>
+              <div>Detail Page - Id: 1</div>
+            </div>
           </Link>
           <Link className="nav-link" to="/not-found">
-            404
+            <div className="d-flex justify-content-center align-items-center gap-2">
+              <div>
+                <GlobeOff size={24} />
+              </div>
+              <div>Not Found Page</div>
+            </div>
           </Link>
         </div>
       </nav>
