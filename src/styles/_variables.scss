@@ -1,2 +1,58 @@
-$font-family: sans-serif;
-$test-color: blue;
+// SCSS static variables
+$font-family: "Segoe UI", sans-serif;
+$header-height: 60px;
+$footer-height: 40px;
+$border-radius: 6px;
+$transition-speed: 0.2s;
+
+// CSS Custom Colors
+// Same variable names with different values
+:root[data-theme="light"] {
+  // Backgrounds
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-surface-alt: #eef0f5;
+
+  // Text
+  --color-text: #1a1d23;
+  --color-text-muted: #6b7280;
+
+  // Brand / accent
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+
+  // Header & footer
+  --color-chrome-bg: #1e1b4b;
+  --color-chrome-text: #ffffff;
+  --color-chrome-muted: rgba(255, 255, 255, 0.65);
+  --color-nav-active-bg: rgba(255, 255, 255, 0.18);
+
+  // Borders & shadows
+  --color-border: #e2e5ed;
+  --color-shadow: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="dark"] {
+  // Backgrounds
+  --color-bg: #0f1117;
+  --color-surface: #1a1d2e;
+  --color-surface-alt: #252840;
+
+  // Text
+  --color-text: #e8eaf0;
+  --color-text-muted: #9ca3af;
+
+  // Brand / accent
+  --color-primary: #818cf8;
+  --color-primary-hover: #6366f1;
+
+  // Header & footer
+  --color-chrome-bg: #12103a;
+  --color-chrome-text: #ffffff;
+  --color-chrome-muted: rgba(255, 255, 255, 0.55);
+  --color-nav-active-bg: rgba(255, 255, 255, 0.14);
+
+  // Borders & shadows
+  --color-border: #2e3250;
+  --color-shadow: rgba(0, 0, 0, 0.35);
+}

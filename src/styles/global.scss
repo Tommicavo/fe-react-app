@@ -1,10 +1,10 @@
-// Custom variables
+// Variables
 @use "variables" as *;
 
 // Bootstrap
 @import "bootstrap/scss/bootstrap";
 
-// Globals
+// Reset
 *,
 *::before,
 *::after {
@@ -13,6 +13,17 @@
   box-sizing: border-box;
 }
 
+// Html
+html {
+  transition:
+    background-color $transition-speed ease,
+    color $transition-speed ease;
+}
+
+// Body
 body {
   font-family: $font-family;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
 }
