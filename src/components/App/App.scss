@@ -1,80 +1,203 @@
 @use "@/styles/variables" as *;
 
+// App Layout
 .app-layout {
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
-// ── Header ──────────────────────────────────────────────
+// Header
 .app-header {
   position: sticky;
   top: 0;
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  padding: 0 1.5rem;
-  height: 56px;
-  background-color: #212529;
-  color: #fff;
+  gap: 1rem;
+  padding: 0 1.25rem;
+  height: $header-height;
+  background-color: var(--color-chrome-bg);
+  color: var(--color-chrome-text);
+  border-bottom: 1px solid var(--color-border);
 
   &__title {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     white-space: nowrap;
+    color: var(--color-chrome-text);
   }
 
   &__nav {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.2rem;
     flex: 1;
 
     a {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 4px;
-      color: rgba(255, 255, 255, 0.75);
+      padding: 0.35rem 0.7rem;
+      border-radius: $border-radius;
+      color: var(--color-chrome-muted);
       text-decoration: none;
       font-size: 0.9rem;
       transition:
-        background 0.15s,
-        color 0.15s;
+        background $transition-speed,
+        color $transition-speed;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
+        background: var(--color-nav-active-bg);
+        color: var(--color-chrome-text);
       }
 
       &.active {
-        background: rgba(255, 255, 255, 0.18);
-        color: #fff;
+        background: var(--color-nav-active-bg);
+        color: var(--color-chrome-text);
         font-weight: 600;
+      }
+    }
+
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  &__logout {
+    color: var(--color-chrome-muted);
+    border-color: var(--color-chrome-muted);
+    font-size: 0.85rem;
+
+    &:hover {
+      color: var(--color-chrome-text);
+      border-color: var(--color-chrome-text);
+      background: var(--color-nav-active-bg);
+    }
+
+    @media (max-width: 400px) {
+      span {
+        display: none;
       }
     }
   }
 
-  &__logout {
-    margin-left: auto;
+  &__hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    background: transparent;
+    border: 1px solid var(--color-chrome-muted);
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: border-color $transition-speed;
+
+    span {
+      display: block;
+      height: 2px;
+      background: var(--color-chrome-text);
+      border-radius: 2px;
+      transition:
+        transform $transition-speed,
+        opacity $transition-speed;
+    }
+
+    &:hover {
+      border-color: var(--color-chrome-text);
+    }
+
+    &.is-open {
+      span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      span:nth-child(2) {
+        opacity: 0;
+      }
+      span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+    }
+
+    @media (max-width: 767px) {
+      display: flex;
+    }
   }
 }
 
-// ── Main ────────────────────────────────────────────────
+.app-mobile-nav {
+  display: none;
+  flex-direction: column;
+  background-color: var(--color-chrome-bg);
+  border-bottom: 1px solid var(--color-border);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+
+  &.is-open {
+    max-height: 400px;
+  }
+
+  @media (max-width: 767px) {
+    display: flex;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.25rem;
+    color: var(--color-chrome-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--color-border);
+    transition:
+      background $transition-speed,
+      color $transition-speed;
+
+    &:hover,
+    &.active {
+      background: var(--color-nav-active-bg);
+      color: var(--color-chrome-text);
+    }
+
+    &.active {
+      font-weight: 600;
+    }
+  }
+}
+
+// Main
 .app-main {
   overflow-y: auto;
   padding: 1.5rem;
+
+  @media (max-width: 575px) {
+    padding: 1rem;
+  }
 }
 
-// ── Footer ──────────────────────────────────────────────
+// Footer
 .app-footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
-  background-color: #343a40;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
+  padding: 0 1.25rem;
+  height: $footer-height;
+  background-color: var(--color-chrome-bg);
+  color: var(--color-chrome-muted);
+  font-size: 0.78rem;
+  border-top: 1px solid var(--color-border);
 }
