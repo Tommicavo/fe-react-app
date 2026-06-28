@@ -1,0 +1,49 @@
+@use "@/styles/variables" as *;
+
+.ai-model-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition:
+    transform $transition-speed ease,
+    box-shadow $transition-speed ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px var(--color-shadow) !important;
+  }
+
+  // Top colour stripe per category
+  &__stripe {
+    height: 4px;
+    border-radius: $border-radius $border-radius 0 0;
+  }
+
+  &__name {
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  &__creator {
+    color: var(--color-text-muted);
+  }
+
+  &__description {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    // Clamp to 3 lines so all cards stay uniform height
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__progress {
+    height: 6px;
+    background-color: var(--color-surface-alt);
+    border-radius: 99px;
+  }
+}
