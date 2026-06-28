@@ -6,7 +6,7 @@ export type AiModelValidationErrors = Partial<
   Record<keyof AiModelFormData, string>
 >;
 
-export interface ValidationResult {
+export interface AiModelValidationResult {
   valid: boolean;
   errors: AiModelValidationErrors;
 }
@@ -16,8 +16,8 @@ const VERSION_MAX = 1000;
 const CREATOR_MAX = 60;
 const DESCRIPTION_MAX = 500;
 
-export const validatorService = {
-  validateAiModel(data: AiModelFormData): ValidationResult {
+export const aiModelValidator = {
+  validateAiModel(data: AiModelFormData): AiModelValidationResult {
     const errors: AiModelValidationErrors = {};
 
     const name = data.name.trim();
@@ -60,10 +60,7 @@ export const validatorService = {
       errors.description = `Description must be at most ${DESCRIPTION_MAX} characters.`;
     }
 
-    return {
-      valid: Object.keys(errors).length === 0,
-      errors,
-    };
+    return { valid: Object.keys(errors).length === 0, errors };
   },
 
   validateField(
@@ -81,67 +78,7 @@ export const validatorService = {
       isActive: true,
       ...patch,
     };
-    const { errors } = validatorService.validateAiModel(dummy);
+    const { errors } = aiModelValidator.validateAiModel(dummy);
     return errors[field];
-  },
-};
-
-// Auth validation
-
-import type {
-  AuthCredentials,
-  AuthValidationErrors,
-} from "@/models/auth.model";
-
-export interface AuthValidationResult {
-  valid: boolean;
-  errors: AuthValidationErrors;
-}
-
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
-
-export const authValidatorService = {
-  validateLogin(data: AuthCredentials): AuthValidationResult {
-    const errors: AuthValidationErrors = {};
-
-    if (!data.username.trim()) {
-      errors.username = "Username is required.";
-    }
-
-    if (!data.password) {
-      errors.password = "Password is required.";
-    }
-
-    return { valid: Object.keys(errors).length === 0, errors };
-  },
-
-  validateRegister(
-    data: AuthCredentials,
-    isUsernameTaken?: boolean,
-  ): AuthValidationResult {
-    const errors: AuthValidationErrors = {};
-
-    if (!data.username.trim()) {
-      errors.username = "Username is required.";
-    } else if (isUsernameTaken) {
-      errors.username = "Username is already taken.";
-    }
-
-    if (!data.password) {
-      errors.password = "Password is required.";
-    } else if (!PASSWORD_REGEX.test(data.password)) {
-      errors.password =
-        "Password must be at least 8 characters and contain one uppercase letter, one lowercase letter, one number, and one symbol.";
-    }
-
-    return { valid: Object.keys(errors).length === 0, errors };
-  },
-
-  validatePasswordStrength(password: string): string | undefined {
-    if (!password) return undefined;
-    if (!PASSWORD_REGEX.test(password)) {
-      return "Must be at least 8 chars with 1 uppercase, 1 lowercase, 1 number, 1 symbol.";
-    }
-    return undefined;
   },
 };
