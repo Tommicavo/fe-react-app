@@ -93,10 +93,7 @@ function AiModelDetailPage() {
         setSuccessMsg("Model created successfully!");
         setTimeout(() => navigate("/"), 1200);
       } else {
-        const updated = await aiModelService.updateAiModel(
-          Number(id),
-          formData,
-        );
+        const updated = await aiModelService.updateAiModel(Number(id), formData);
         setModel(updated.data);
         setMode("view");
         setSuccessMsg("Model updated successfully!");
@@ -147,7 +144,6 @@ function AiModelDetailPage() {
 
   return (
     <div className="ai-detail-page container py-4">
-      {/* ── Back button ── */}
       <button
         className="btn btn-sm btn-outline-secondary mb-4 d-inline-flex align-items-center gap-1"
         onClick={() => navigate("/")}
@@ -175,26 +171,20 @@ function AiModelDetailPage() {
       {/* ── VIEW mode ── */}
       {mode === "view" && model && (
         <div className="card ai-detail-page__card shadow-sm">
-          {/* Colour stripe */}
-          <div
-            className="ai-detail-page__stripe"
-            style={{ backgroundColor: currentCategory?.color ?? "#ccc" }}
-          />
+          <div className="ai-detail-page__stripe" />
 
           <div className="card-body p-4">
-            {/* Header row */}
+            {/* Header */}
             <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
               <div>
                 <h2 className="ai-detail-page__title mb-1">{model.name}</h2>
-                <span className="text-muted small">ID #{model.id}</span>
+                <span className="ai-detail-page__id-label">ID #{model.id}</span>
               </div>
-              <div className="d-flex gap-2">
-                <span
-                  className={`badge fs-6 ${model.isActive ? "bg-success" : "bg-secondary"}`}
-                >
-                  {model.isActive ? "Active" : "Inactive"}
-                </span>
-              </div>
+              <span
+                className={`badge fs-6 ${model.isActive ? "bg-success" : "bg-secondary"}`}
+              >
+                {model.isActive ? "Active" : "Inactive"}
+              </span>
             </div>
 
             {/* Detail grid */}
@@ -202,7 +192,7 @@ function AiModelDetailPage() {
               <div className="col-6 col-md-3">
                 <div className="ai-detail-page__field">
                   <span className="ai-detail-page__field-label">Version</span>
-                  <span className="badge bg-primary bg-opacity-10 text-primary fs-6">
+                  <span className="ai-detail-page__version-badge badge">
                     v{model.version}
                   </span>
                 </div>
@@ -219,18 +209,11 @@ function AiModelDetailPage() {
                 <div className="ai-detail-page__field">
                   <span className="ai-detail-page__field-label">Category</span>
                   {currentCategory ? (
-                    <span
-                      className="badge"
-                      style={{
-                        backgroundColor: currentCategory.color + "22",
-                        color: currentCategory.color,
-                        border: `1px solid ${currentCategory.color}55`,
-                      }}
-                    >
+                    <span className="ai-detail-page__category-badge badge">
                       {currentCategory.label}
                     </span>
                   ) : (
-                    <span className="text-muted">—</span>
+                    <span className="ai-detail-page__field-value">—</span>
                   )}
                 </div>
               </div>
@@ -238,9 +221,7 @@ function AiModelDetailPage() {
                 <div className="ai-detail-page__field">
                   <span className="ai-detail-page__field-label">Accuracy</span>
                   <div>
-                    <span
-                      className={`fw-bold text-${accuracyColor(model.accuracy)}`}
-                    >
+                    <span className={`fw-bold text-${accuracyColor(model.accuracy)}`}>
                       {model.accuracy}%
                     </span>
                     <div className="progress ai-detail-page__progress mt-1">
@@ -269,7 +250,7 @@ function AiModelDetailPage() {
             </div>
 
             {/* Actions */}
-            <div className="d-flex gap-2 pt-3 border-top">
+            <div className="d-flex gap-2 pt-3 ai-detail-page__divider">
               <button
                 className="btn btn-primary"
                 onClick={() => setMode("edit")}
@@ -299,7 +280,7 @@ function AiModelDetailPage() {
               <div className="row g-3">
                 {/* Name */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold" htmlFor="name">
+                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="name">
                     Name <span className="text-danger">*</span>
                   </label>
                   <input
@@ -316,7 +297,7 @@ function AiModelDetailPage() {
 
                 {/* Version */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold" htmlFor="version">
+                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="version">
                     Version <span className="text-danger">*</span>
                   </label>
                   <input
@@ -333,7 +314,7 @@ function AiModelDetailPage() {
 
                 {/* Creator */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold" htmlFor="creator">
+                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="creator">
                     Creator <span className="text-danger">*</span>
                   </label>
                   <input
@@ -350,10 +331,7 @@ function AiModelDetailPage() {
 
                 {/* Category */}
                 <div className="col-12 col-md-6">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="categoryId"
-                  >
+                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="categoryId">
                     Category <span className="text-danger">*</span>
                   </label>
                   <select
@@ -377,7 +355,7 @@ function AiModelDetailPage() {
 
                 {/* Accuracy */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold" htmlFor="accuracy">
+                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="accuracy">
                     Accuracy (%)
                   </label>
                   <input
@@ -391,7 +369,6 @@ function AiModelDetailPage() {
                     value={formData.accuracy}
                     onChange={handleChange}
                   />
-                  {/* Live preview */}
                   <div className="progress mt-2" style={{ height: "6px" }}>
                     <div
                       className={`progress-bar bg-${accuracyColor(formData.accuracy)}`}
@@ -412,7 +389,7 @@ function AiModelDetailPage() {
                       onChange={handleChange}
                     />
                     <label
-                      className="form-check-label fw-semibold"
+                      className="form-check-label fw-semibold ai-detail-page__form-label"
                       htmlFor="isActive"
                     >
                       Active
@@ -422,10 +399,7 @@ function AiModelDetailPage() {
 
                 {/* Description */}
                 <div className="col-12">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="description"
-                  >
+                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="description">
                     Description
                   </label>
                   <textarea
@@ -440,8 +414,8 @@ function AiModelDetailPage() {
                 </div>
               </div>
 
-              {/* Form actions */}
-              <div className="d-flex gap-2 mt-4 pt-3 border-top">
+              {/* Actions */}
+              <div className="d-flex gap-2 mt-4 pt-3 ai-detail-page__divider">
                 <button
                   type="submit"
                   className="btn btn-primary"

@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { Outlet, Navigate, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Home, LockKeyhole, Settings, Search, LogOut } from "lucide-react";
+import { Home, LockKeyhole, Settings, LogOut } from "lucide-react";
 import "./App.scss";
 
 const NAV_LINKS = [
   { to: "/", label: "Home", icon: <Home size={18} />, end: true },
   { to: "/admin", label: "Admin", icon: <LockKeyhole size={18} />, end: false },
-  { to: "/setting", label: "Settings", icon: <Settings size={18} />, end: false },
-  { to: "/detail/1", label: "Detail", icon: <Search size={18} />, end: false },
+  {
+    to: "/setting",
+    label: "Settings",
+    icon: <Settings size={18} />,
+    end: false,
+  },
 ];
 
 function App() {
@@ -41,11 +45,19 @@ function App() {
         </nav>
 
         <div className="app-header__actions">
-          <button className="btn btn-sm app-header__logout" onClick={handleLogout} title="Logout">
+          <button
+            className="btn btn-sm app-header__logout"
+            onClick={handleLogout}
+            title="Logout"
+          >
             <LogOut size={16} /> <span>Logout</span>
           </button>
 
-          <button className={`app-header__hamburger ${menuOpen ? "is-open" : ""}`} onClick={() => setMenuOpen((o) => !o)} aria-label="Toggle navigation">
+          <button
+            className={`app-header__hamburger ${menuOpen ? "is-open" : ""}`}
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="Toggle navigation"
+          >
             <span />
             <span />
             <span />
@@ -55,7 +67,12 @@ function App() {
 
       <nav className={`app-mobile-nav ${menuOpen ? "is-open" : ""}`}>
         {NAV_LINKS.map((link) => (
-          <NavLink key={link.to} to={link.to} end={link.end} onClick={closeMenu}>
+          <NavLink
+            key={link.to}
+            to={link.to}
+            end={link.end}
+            onClick={closeMenu}
+          >
             {link.icon} {link.label}
           </NavLink>
         ))}

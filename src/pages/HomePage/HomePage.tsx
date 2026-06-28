@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDownAZ, ArrowUpAZ, ArrowDown01, ArrowUp01 } from "lucide-react";
+import {
+  ArrowDownAZ,
+  ArrowUpAZ,
+  ArrowDown01,
+  ArrowUp01,
+  PlusCircle,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { aiModelService } from "@/services/aiModel.service";
 import { categoryService } from "@/services/category.service";
 import type { AIModel } from "@/models/aiModel.model";
@@ -41,20 +48,19 @@ function SortBtn({
 }
 
 function HomePage() {
-  // Data
+  const navigate = useNavigate();
+
   const [models, setModels] = useState<AIModel[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters
   const [nameFilter, setNameFilter] = useState("");
   const [accuracyMin, setAccuracyMin] = useState<number | "">("");
   const [creatorFilter, setCreatorFilter] = useState("");
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Sort
   const [nameSort, setNameSort] = useState<SortDir>(null);
   const [accuracySort, setAccuracySort] = useState<SortDir>(null);
   const [creatorSort, setCreatorSort] = useState<SortDir>(null);
@@ -168,14 +174,22 @@ function HomePage() {
 
   return (
     <div className="home-page container-fluid py-3 px-3 px-md-4">
-      <div className="d-flex align-items-center justify-content-between mb-4">
+      {/* ── Page header ── */}
+      <div className="home-page__header d-flex align-items-center justify-content-between mb-4">
         <h1 className="home-page__title mb-0">AI Models Catalogue</h1>
+        <button
+          className="home-page__new-btn btn btn-primary d-inline-flex align-items-center gap-2"
+          onClick={() => navigate("/models/new")}
+        >
+          <PlusCircle size={18} />
+          <span>New Model</span>
+        </button>
       </div>
 
       {/* ── Filters ── */}
       <div className="home-page__filters card p-3 mb-4">
         <div className="d-flex align-items-center justify-content-between mb-3">
-          <span className="fw-semibold small text-muted text-uppercase">
+          <span className="fw-semibold small text-uppercase home-page__filter-label">
             Filter &amp; Sort
           </span>
           {hasActiveFilters && (
@@ -280,14 +294,8 @@ function HomePage() {
                           <input
                             type="checkbox"
                             className="form-check-input mt-0"
-                            checked={selectedCategoryIds.includes(
-                              Number(cat.id),
-                            )}
+                            checked={selectedCategoryIds.includes(Number(cat.id))}
                             onChange={() => toggleCategory(Number(cat.id))}
-                          />
-                          <span
-                            className="home-page__category-dot"
-                            style={{ backgroundColor: cat.color }}
                           />
                           {cat.label}
                         </label>
@@ -303,13 +311,12 @@ function HomePage() {
 
       {/* ── Results count ── */}
       {!loading && !error && (
-        <p className="text-muted small mb-3">
+        <p className="home-page__count small mb-3">
           Showing <strong>{displayedModels.length}</strong> of{" "}
           <strong>{models.length}</strong> models
         </p>
       )}
 
-      {/* ── States ── */}
       {loading && (
         <div className="d-flex justify-content-center py-5">
           <div className="spinner-border text-primary" role="status">
@@ -330,7 +337,7 @@ function HomePage() {
         </div>
       )}
 
-      {/* ── AIModel Cards Grid ── */}
+      {/* ── Cards Grid ── */}
       {!loading && !error && (
         <div className="row g-3">
           {displayedModels.map((model) => (

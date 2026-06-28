@@ -1,6 +1,11 @@
 @use "@/styles/variables" as *;
 
 .home-page {
+  &__header {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
   &__title {
     color: var(--color-text);
     font-size: 1.5rem;
@@ -11,10 +16,37 @@
     }
   }
 
+  &__new-btn {
+    white-space: nowrap;
+    font-weight: 600;
+    padding: 0.45rem 1rem;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+
+    &:hover {
+      background-color: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
+      color: #fff;
+    }
+  }
+
+  &__filter-label {
+    color: var(--color-text-muted);
+  }
+
+  &__count {
+    color: var(--color-text-muted);
+  }
+
   &__filters {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: $border-radius;
+
+    .form-label {
+      color: var(--color-text-muted);
+    }
 
     .form-control,
     .btn-outline-secondary {
@@ -32,6 +64,11 @@
         border-color: var(--color-primary);
         box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.2);
       }
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
     }
   }
 
@@ -58,15 +95,13 @@
 
       &:hover {
         background-color: var(--color-surface-alt);
+        color: var(--color-text);
+      }
+
+      .form-check-input:checked {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
       }
     }
-  }
-
-  &__category-dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
   }
 }

@@ -30,6 +30,14 @@ $transition-speed: 0.2s;
   // Borders & shadows
   --color-border: #e2e5ed;
   --color-shadow: rgba(0, 0, 0, 0.08);
+
+  // Category badge
+  --color-category-bg: #ede9fe;
+  --color-category-text: #4f46e5;
+  --color-category-border: #c4b5fd;
+
+  // Card top stripe
+  --color-stripe: #4f46e5;
 }
 
 :root[data-theme="dark"] {
@@ -55,4 +63,12 @@ $transition-speed: 0.2s;
   // Borders & shadows
   --color-border: #2e3250;
   --color-shadow: rgba(0, 0, 0, 0.35);
+
+  // Category badge
+  --color-category-bg: #2e2b5e;
+  --color-category-text: #a5b4fc;
+  --color-category-border: #4338ca;
+
+  // Card top stripe
+  --color-stripe: #818cf8;
 }

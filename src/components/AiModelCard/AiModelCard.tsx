@@ -26,26 +26,16 @@ function AiModelCard({ model, category }: Props) {
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && navigate(`/models/${model.id}`)}
     >
-      {/* Category colour stripe */}
-      <div
-        className="ai-model-card__stripe"
-        style={{ backgroundColor: category?.color ?? "#ccc" }}
-      />
+      {/* Stripe */}
+      <div className="ai-model-card__stripe" />
 
       <div className="card-body d-flex flex-column gap-3">
         {/* Name */}
         <h5 className="card-title ai-model-card__name mb-0">{model.name}</h5>
 
-        {/* Category pill */}
+        {/* Category badge */}
         {category && (
-          <span
-            className="ai-model-card__category badge align-self-start"
-            style={{
-              backgroundColor: category.color + "22",
-              color: category.color,
-              border: `1px solid ${category.color}55`,
-            }}
-          >
+          <span className="ai-model-card__category badge align-self-start">
             {category.label}
           </span>
         )}

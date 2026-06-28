@@ -27,3 +27,110 @@ body {
   color: var(--color-text);
   min-height: 100vh;
 }
+
+.card {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.card-body {
+  color: var(--color-text);
+}
+
+.alert {
+  color: var(--color-text);
+}
+
+.progress {
+  background-color: var(--color-surface-alt);
+}
+
+.badge.bg-secondary {
+  background-color: var(--color-surface-alt) !important;
+  color: var(--color-text-muted) !important;
+}
+
+.form-control,
+.form-select {
+  background-color: var(--color-surface-alt);
+  border-color: var(--color-border);
+  color: var(--color-text);
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  &:focus {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.2);
+  }
+
+  option {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+}
+
+.form-label,
+.form-check-label {
+  color: var(--color-text);
+}
+
+.form-check-input {
+  background-color: var(--color-surface-alt);
+  border-color: var(--color-border);
+
+  &:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.2);
+    border-color: var(--color-primary);
+  }
+}
+
+.input-group-text {
+  background-color: var(--color-surface-alt);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.dropdown-menu {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.dropdown-item {
+  color: var(--color-text);
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-surface-alt);
+    color: var(--color-text);
+  }
+}
+
+.btn-outline-secondary {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+
+  &:hover {
+    background-color: var(--color-surface-alt);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+}
+
+.btn-close {
+  filter: var(--bs-btn-close-filter, none);
+}
+
+.spinner-border {
+  color: var(--color-primary);
+}
