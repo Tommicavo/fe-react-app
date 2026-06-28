@@ -4,19 +4,8 @@ import { useAuth } from "@/context/AuthContext";
 import { Home, LockKeyhole, Settings, LogOut } from "lucide-react";
 import "./App.scss";
 
-const NAV_LINKS = [
-  { to: "/", label: "Home", icon: <Home size={18} />, end: true },
-  { to: "/admin", label: "Admin", icon: <LockKeyhole size={18} />, end: false },
-  {
-    to: "/setting",
-    label: "Settings",
-    icon: <Settings size={18} />,
-    end: false,
-  },
-];
-
 function App() {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -24,12 +13,13 @@ function App() {
     return <Navigate to="/login" replace />;
   }
 
+  const isAdmin = currentUser?.role === "ADMIN";
+  const closeMenu = () => setMenuOpen(false);
+
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
   };
-
-  const closeMenu = () => setMenuOpen(false);
 
   return (
     <div className="app-layout">
@@ -37,11 +27,17 @@ function App() {
         <span className="app-header__title">AI Catalogue</span>
 
         <nav className="app-header__nav">
-          {NAV_LINKS.map((link) => (
-            <NavLink key={link.to} to={link.to} end={link.end}>
-              {link.icon} {link.label}
+          <NavLink to="/" end>
+            <Home size={18} /> Home
+          </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin">
+              <LockKeyhole size={18} /> Admin
             </NavLink>
-          ))}
+          )}
+          <NavLink to="/setting">
+            <Settings size={18} /> Settings
+          </NavLink>
         </nav>
 
         <div className="app-header__actions">
@@ -66,16 +62,17 @@ function App() {
       </header>
 
       <nav className={`app-mobile-nav ${menuOpen ? "is-open" : ""}`}>
-        {NAV_LINKS.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            end={link.end}
-            onClick={closeMenu}
-          >
-            {link.icon} {link.label}
+        <NavLink to="/" end onClick={closeMenu}>
+          <Home size={18} /> Home
+        </NavLink>
+        {isAdmin && (
+          <NavLink to="/admin" onClick={closeMenu}>
+            <LockKeyhole size={18} /> Admin
           </NavLink>
-        ))}
+        )}
+        <NavLink to="/setting" onClick={closeMenu}>
+          <Settings size={18} /> Settings
+        </NavLink>
       </nav>
 
       <main className="app-main">

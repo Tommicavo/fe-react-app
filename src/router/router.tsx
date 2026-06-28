@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import App from "@/components/App/App";
+import AdminGuard from "@/components/AdminGuard/AdminGuard";
 import LoginPage from "@/pages/LoginPage/LoginPage";
 import HomePage from "@/pages/HomePage/HomePage";
 import AdminPage from "@/pages/AdminPage/AdminPage";
@@ -18,7 +19,14 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "admin", element: <AdminPage /> },
+      {
+        path: "admin",
+        element: (
+          <AdminGuard>
+            <AdminPage />
+          </AdminGuard>
+        ),
+      },
       { path: "setting", element: <SettingPage /> },
       { path: "models/new", element: <AiModelDetailPage /> },
       { path: "models/:id", element: <AiModelDetailPage /> },
