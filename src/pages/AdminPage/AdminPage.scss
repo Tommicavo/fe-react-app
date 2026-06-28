@@ -1,0 +1,238 @@
+@use "@/styles/variables" as *;
+
+.admin-page {
+  max-width: 720px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: 2rem;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+}
+
+.admin-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius;
+  padding: 1.5rem;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--color-text);
+
+    svg {
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  &__badge {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: var(--color-category-bg);
+    color: var(--color-category-text);
+    border: 1px solid var(--color-category-border);
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+  }
+}
+
+.admin-create-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+
+  &__field {
+    flex: 1;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
+    }
+
+    @media (max-width: 480px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+.admin-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: $border-radius;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+
+  &--danger {
+    background-color: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    color: #dc2626;
+  }
+
+  &__close {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+}
+
+.admin-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+.admin-empty {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.admin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    background-color: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: $border-radius;
+    transition: border-color $transition-speed;
+
+    &:hover {
+      border-color: var(--color-primary);
+    }
+  }
+
+  &__label {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--color-text);
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  &__edit {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+    }
+  }
+
+  &__edit-field {
+    flex: 1;
+  }
+
+  &__edit-actions {
+    display: flex;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  &__confirm {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  &__confirm-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--color-text);
+
+    strong {
+      color: #dc2626;
+    }
+  }
+
+  &__confirm-actions {
+    display: flex;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+}
+
+.form-control {
+  background-color: var(--color-surface-alt);
+  border-color: var(--color-border);
+  color: var(--color-text);
+
+  &:focus {
+    background-color: var(--color-surface-alt);
+    border-color: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.2);
+  }
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  &.is-invalid {
+    border-color: #dc2626;
+  }
+}
