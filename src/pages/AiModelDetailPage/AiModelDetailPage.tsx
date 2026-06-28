@@ -3,10 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { aiModelService } from "@/services/aiModel.service";
 import { categoryService } from "@/services/category.service";
 import {
-  validatorService,
+  aiModelValidator,
   type AiModelFormData,
   type AiModelValidationErrors,
-} from "@/services/validator.service";
+} from "@/services/validators/aiModel.validator";
 import type { AIModel } from "@/models/aiModel.model";
 import type { Category } from "@/models/category.model";
 import "./AiModelDetailPage.scss";
@@ -90,7 +90,7 @@ function AiModelDetailPage() {
     setFormData(next);
 
     if (submitted) {
-      const err = validatorService.validateField(
+      const err = aiModelValidator.validateField(
         key,
         cast as AiModelFormData[typeof key],
       );
@@ -104,7 +104,7 @@ function AiModelDetailPage() {
     setApiError(null);
     setSuccessMsg(null);
 
-    const { valid, errors } = validatorService.validateAiModel(formData);
+    const { valid, errors } = aiModelValidator.validateAiModel(formData);
     setFieldErrors(errors);
     if (!valid) return;
 

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/services/auth.service";
 import {
-  authValidatorService,
+  authValidator,
   type AuthValidationResult,
-} from "@/services/validator.service";
+} from "@/services/validators/auth.validator";
 import "./LoginPage.scss";
 import type {
   AuthCredentials,
@@ -50,8 +50,8 @@ function LoginPage() {
 
   const validate = (): AuthValidationResult => {
     return mode === "login"
-      ? authValidatorService.validateLogin(form)
-      : authValidatorService.validateRegister(form);
+      ? authValidator.validateLogin(form)
+      : authValidator.validateRegister(form);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
