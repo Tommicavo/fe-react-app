@@ -14,10 +14,10 @@
     box-shadow: 0 4px 24px var(--color-shadow);
     padding: 2.5rem 2rem;
     width: 100%;
-    max-width: 380px;
+    max-width: 400px;
     text-align: center;
 
-    @media (max-width: 400px) {
+    @media (max-width: 430px) {
       margin: 1rem;
       padding: 2rem 1.25rem;
     }
@@ -27,22 +27,120 @@
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--color-text);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
   }
 
   &__subtitle {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  &__tabs {
+    display: flex;
+    border: 1px solid var(--color-border);
+    border-radius: $border-radius;
+    overflow: hidden;
     margin-bottom: 1.75rem;
+  }
+
+  &__tab {
+    flex: 1;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition:
+      background-color $transition-speed,
+      color $transition-speed;
+
+    &:hover:not(&--active) {
+      background-color: var(--color-surface-alt);
+    }
+
+    &--active {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+  }
+
+  &__form {
+    text-align: left;
+  }
+
+  &__field {
+    margin-bottom: 1.1rem;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.35rem;
+  }
+
+  &__hint {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 0.3rem;
+  }
+
+  &__server-error {
+    font-size: 0.8125rem;
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    border-radius: $border-radius;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  &__submit {
+    margin-top: 0.5rem;
   }
 
   .btn-primary {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
 
-    &:hover {
+    &:hover:not(:disabled) {
       background-color: var(--color-primary-hover);
       border-color: var(--color-primary-hover);
     }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  .form-control {
+    background-color: var(--color-surface-alt);
+    border-color: var(--color-border);
+    color: var(--color-text);
+
+    &:focus {
+      background-color: var(--color-surface-alt);
+      border-color: var(--color-primary);
+      color: var(--color-text);
+      box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.2);
+    }
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    &.is-invalid {
+      border-color: #dc2626;
+    }
+  }
+
+  .invalid-feedback {
+    font-size: 0.775rem;
   }
 }

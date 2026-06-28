@@ -1,14 +1,16 @@
 {
   "users": [
     {
-      "id": "1",
-      "username": "admin-usr",
-      "role": "ADMIN"
+      "username": "admin",
+      "password": "7f88bfff7b834eb791dd613df958727df9b2259860798747c1b94430d25cf577",
+      "role": "ADMIN",
+      "id": "Iu40Wxd-OwY"
     },
     {
-      "id": "2",
-      "username": "default-usr",
-      "role": "DEFAULT"
+      "username": "user",
+      "password": "7f88bfff7b834eb791dd613df958727df9b2259860798747c1b94430d25cf577",
+      "role": "DEFAULT",
+      "id": "sE-YCIH71yQ"
     }
   ],
   "categories": [
@@ -153,16 +155,6 @@
       "accuracy": 85,
       "creator": "OpenAI",
       "isActive": false
-    },
-    {
-      "categoryId": "3",
-      "name": "asd",
-      "version": "asd",
-      "description": "dsa",
-      "accuracy": 54,
-      "creator": "asd",
-      "isActive": true,
-      "id": "TP62Hdf6NoU"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
