@@ -5,7 +5,7 @@ import LoginPage from "@/pages/LoginPage/LoginPage";
 import HomePage from "@/pages/HomePage/HomePage";
 import AdminPage from "@/pages/AdminPage/AdminPage";
 import SettingPage from "@/pages/SettingPage/SettingPage";
-import DetailPage from "@/pages/DetailPage/DetailPage";
+import AiModelDetailPage from "@/pages/AiModelDetailPage/AiModelDetailPage";
 import NotFoundPage from "@/pages/NotFoundPage/NotFoundPage";
 
 const router = createBrowserRouter([
@@ -20,7 +20,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "admin", element: <AdminPage /> },
       { path: "setting", element: <SettingPage /> },
-      { path: "detail/:id", element: <DetailPage /> },
+      { path: "models/:id", element: <AiModelDetailPage /> },
+      { path: "models/new", element: <AiModelDetailPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
