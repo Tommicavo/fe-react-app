@@ -35,14 +35,14 @@
   ],
   "aimodels": [
     {
+      "id": "1",
       "categoryId": 1,
       "name": "Gemini",
       "version": "3.1 Pro",
       "description": "LLM model designed to read, understand, and generate human language.",
       "accuracy": 94.5,
       "creator": "Google",
-      "isActive": true,
-      "id": "1"
+      "isActive": true
     },
     {
       "id": "2",
@@ -153,27 +153,6 @@
       "accuracy": 85,
       "creator": "OpenAI",
       "isActive": false
-    },
-    {
-      "categoryId": 1,
-      "name": "dsadsa",
-      "version": "1",
-      "description": "dsdsdsds",
-      "accuracy": 12,
-      "creator": "asdasd",
-      "isActive": false,
-      "id": "nCSGE3tC9ko"
-    },
-    {
-      "categoryId": 0,
-      "name": "",
-      "version": "",
-      "description": "",
-      "accuracy": 0,
-      "creator": "",
-      "isActive": true,
-      "id": "CX0oVj0usq4"
     }
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+  ]
 }

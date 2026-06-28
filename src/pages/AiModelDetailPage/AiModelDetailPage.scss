@@ -47,7 +47,6 @@
     color: var(--color-text);
   }
 
-  // Version badge — same visual weight as category but a different hue bucket
   &__version-badge {
     background-color: var(--color-surface-alt);
     color: var(--color-primary);
@@ -55,7 +54,6 @@
     font-weight: 500;
   }
 
-  // Category badge — theme-aware via CSS vars
   &__category-badge {
     background-color: var(--color-category-bg);
     color: var(--color-category-text);
@@ -78,7 +76,6 @@
     border-top: 1px solid var(--color-border);
   }
 
-  // Form controls — themed
   .form-control,
   .form-select {
     background-color: var(--color-surface-alt);
@@ -102,13 +99,27 @@
     }
   }
 
-  // Form switch label
   .form-check-label {
     color: var(--color-text);
   }
 
-  // Progress track
   .progress {
     background-color: var(--color-surface-alt);
+  }
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+  border-color: #198754;
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.2);
   }
 }

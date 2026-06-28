@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { aiModelService } from "@/services/aiModel.service";
 import { categoryService } from "@/services/category.service";
+import {
+  validatorService,
+  type AiModelFormData,
+  type AiModelValidationErrors,
+} from "@/services/validator.service";
 import type { AIModel } from "@/models/aiModel.model";
 import type { Category } from "@/models/category.model";
 import "./AiModelDetailPage.scss";
 
 type Mode = "view" | "edit" | "create";
 
-const EMPTY_MODEL: Omit<AIModel, "id"> = {
+const EMPTY_MODEL: AiModelFormData = {
   categoryId: 0,
   name: "",
   version: "",
@@ -26,11 +31,15 @@ function AiModelDetailPage() {
   const [mode, setMode] = useState<Mode>(isCreate ? "create" : "view");
 
   const [model, setModel] = useState<AIModel | null>(null);
-  const [formData, setFormData] = useState<Omit<AIModel, "id">>(EMPTY_MODEL);
+  const [formData, setFormData] = useState<AiModelFormData>(EMPTY_MODEL);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(!isCreate);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const [fieldErrors, setFieldErrors] = useState<AiModelValidationErrors>({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const [apiError, setApiError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,7 +62,7 @@ function AiModelDetailPage() {
         });
         setCategories(catRes.data);
       })
-      .catch(() => setError("Failed to load model data."))
+      .catch(() => setApiError("Failed to load model data."))
       .finally(() => setLoading(false));
   }, [id, isCreate]);
 
@@ -71,35 +80,53 @@ function AiModelDetailPage() {
     >,
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
-          : name === "accuracy" || name === "categoryId"
-            ? Number(value)
-            : value,
-    }));
+    const cast =
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : name === "accuracy" || name === "categoryId"
+          ? Number(value)
+          : value;
+
+    const key = name as keyof AiModelFormData;
+    const next = { ...formData, [key]: cast };
+    setFormData(next);
+
+    if (submitted) {
+      const err = validatorService.validateField(
+        key,
+        cast as AiModelFormData[typeof key],
+      );
+      setFieldErrors((prev) => ({ ...prev, [key]: err }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    setError(null);
+    setSubmitted(true);
+    setApiError(null);
     setSuccessMsg(null);
+
+    const { valid, errors } = validatorService.validateAiModel(formData);
+    setFieldErrors(errors);
+    if (!valid) return;
+
+    setSaving(true);
     try {
       if (isCreate) {
         await aiModelService.insertAiModel(formData);
         setSuccessMsg("Model created successfully!");
         setTimeout(() => navigate("/"), 1200);
       } else {
-        const updated = await aiModelService.updateAiModel(Number(id), formData);
+        const updated = await aiModelService.updateAiModel(
+          Number(id),
+          formData,
+        );
         setModel(updated.data);
         setMode("view");
         setSuccessMsg("Model updated successfully!");
       }
     } catch {
-      setError("Failed to save. Please try again.");
+      setApiError("Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -112,7 +139,7 @@ function AiModelDetailPage() {
       await aiModelService.deleteAiModel(Number(id));
       navigate("/");
     } catch {
-      setError("Failed to delete model.");
+      setApiError("Failed to delete model.");
     }
   };
 
@@ -128,9 +155,18 @@ function AiModelDetailPage() {
         isActive: model.isActive,
       });
     }
+    setFieldErrors({});
+    setSubmitted(false);
     setMode("view");
-    setError(null);
+    setApiError(null);
   };
+
+  const cx = (field: keyof AiModelFormData) =>
+    submitted && fieldErrors[field]
+      ? "is-invalid"
+      : submitted
+        ? "is-valid"
+        : "";
 
   if (loading) {
     return (
@@ -151,14 +187,14 @@ function AiModelDetailPage() {
         ← Back to catalogue
       </button>
 
-      {/* ── Alerts ── */}
-      {error && (
+      {/* ── API-level alerts ── */}
+      {apiError && (
         <div className="alert alert-danger alert-dismissible" role="alert">
-          {error}
+          {apiError}
           <button
             type="button"
             className="btn-close"
-            onClick={() => setError(null)}
+            onClick={() => setApiError(null)}
           />
         </div>
       )}
@@ -174,7 +210,6 @@ function AiModelDetailPage() {
           <div className="ai-detail-page__stripe" />
 
           <div className="card-body p-4">
-            {/* Header */}
             <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
               <div>
                 <h2 className="ai-detail-page__title mb-1">{model.name}</h2>
@@ -187,7 +222,6 @@ function AiModelDetailPage() {
               </span>
             </div>
 
-            {/* Detail grid */}
             <div className="row g-3 mb-4">
               <div className="col-6 col-md-3">
                 <div className="ai-detail-page__field">
@@ -221,7 +255,9 @@ function AiModelDetailPage() {
                 <div className="ai-detail-page__field">
                   <span className="ai-detail-page__field-label">Accuracy</span>
                   <div>
-                    <span className={`fw-bold text-${accuracyColor(model.accuracy)}`}>
+                    <span
+                      className={`fw-bold text-${accuracyColor(model.accuracy)}`}
+                    >
                       {model.accuracy}%
                     </span>
                     <div className="progress ai-detail-page__progress mt-1">
@@ -239,7 +275,6 @@ function AiModelDetailPage() {
               </div>
             </div>
 
-            {/* Description */}
             <div className="mb-4">
               <span className="ai-detail-page__field-label d-block mb-1">
                 Description
@@ -249,7 +284,6 @@ function AiModelDetailPage() {
               </p>
             </div>
 
-            {/* Actions */}
             <div className="d-flex gap-2 pt-3 ai-detail-page__divider">
               <button
                 className="btn btn-primary"
@@ -280,67 +314,88 @@ function AiModelDetailPage() {
               <div className="row g-3">
                 {/* Name */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="name">
+                  <label
+                    className="form-label fw-semibold ai-detail-page__form-label"
+                    htmlFor="name"
+                  >
                     Name <span className="text-danger">*</span>
                   </label>
                   <input
                     id="name"
                     name="name"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${cx("name")}`}
                     value={formData.name}
                     onChange={handleChange}
-                    required
                     placeholder="e.g. GPT-5"
                   />
+                  {fieldErrors.name && (
+                    <div className="invalid-feedback">{fieldErrors.name}</div>
+                  )}
                 </div>
 
                 {/* Version */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="version">
+                  <label
+                    className="form-label fw-semibold ai-detail-page__form-label"
+                    htmlFor="version"
+                  >
                     Version <span className="text-danger">*</span>
                   </label>
                   <input
                     id="version"
                     name="version"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${cx("version")}`}
                     value={formData.version}
                     onChange={handleChange}
-                    required
                     placeholder="e.g. 1.0"
                   />
+                  {fieldErrors.version && (
+                    <div className="invalid-feedback">
+                      {fieldErrors.version}
+                    </div>
+                  )}
                 </div>
 
                 {/* Creator */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="creator">
+                  <label
+                    className="form-label fw-semibold ai-detail-page__form-label"
+                    htmlFor="creator"
+                  >
                     Creator <span className="text-danger">*</span>
                   </label>
                   <input
                     id="creator"
                     name="creator"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${cx("creator")}`}
                     value={formData.creator}
                     onChange={handleChange}
-                    required
                     placeholder="e.g. OpenAI"
                   />
+                  {fieldErrors.creator && (
+                    <div className="invalid-feedback">
+                      {fieldErrors.creator}
+                    </div>
+                  )}
                 </div>
 
                 {/* Category */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="categoryId">
+                  <label
+                    className="form-label fw-semibold ai-detail-page__form-label"
+                    htmlFor="categoryId"
+                  >
                     Category <span className="text-danger">*</span>
                   </label>
                   <select
                     id="categoryId"
                     name="categoryId"
-                    className="form-select"
+                    className={`form-select ${cx("categoryId")}`}
                     value={formData.categoryId}
                     onChange={handleChange}
-                    required
                   >
                     <option value={0} disabled>
                       Select a category…
@@ -351,24 +406,37 @@ function AiModelDetailPage() {
                       </option>
                     ))}
                   </select>
+                  {fieldErrors.categoryId && (
+                    <div className="invalid-feedback">
+                      {fieldErrors.categoryId}
+                    </div>
+                  )}
                 </div>
 
                 {/* Accuracy */}
                 <div className="col-12 col-md-6">
-                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="accuracy">
+                  <label
+                    className="form-label fw-semibold ai-detail-page__form-label"
+                    htmlFor="accuracy"
+                  >
                     Accuracy (%)
                   </label>
                   <input
                     id="accuracy"
                     name="accuracy"
                     type="number"
-                    className="form-control"
+                    className={`form-control ${cx("accuracy")}`}
                     min={0}
                     max={100}
                     step={0.1}
                     value={formData.accuracy}
                     onChange={handleChange}
                   />
+                  {fieldErrors.accuracy && (
+                    <div className="invalid-feedback">
+                      {fieldErrors.accuracy}
+                    </div>
+                  )}
                   <div className="progress mt-2" style={{ height: "6px" }}>
                     <div
                       className={`progress-bar bg-${accuracyColor(formData.accuracy)}`}
@@ -399,18 +467,29 @@ function AiModelDetailPage() {
 
                 {/* Description */}
                 <div className="col-12">
-                  <label className="form-label fw-semibold ai-detail-page__form-label" htmlFor="description">
+                  <label
+                    className="form-label fw-semibold ai-detail-page__form-label"
+                    htmlFor="description"
+                  >
                     Description
                   </label>
                   <textarea
                     id="description"
                     name="description"
-                    className="form-control"
+                    className={`form-control ${cx("description")}`}
                     rows={3}
                     value={formData.description}
                     onChange={handleChange}
                     placeholder="Brief description of the model…"
                   />
+                  {fieldErrors.description && (
+                    <div className="invalid-feedback">
+                      {fieldErrors.description}
+                    </div>
+                  )}
+                  <div className="ai-detail-page__char-count">
+                    {formData.description.trim().length} / 500
+                  </div>
                 </div>
               </div>
 
