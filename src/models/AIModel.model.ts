@@ -1,6 +1,6 @@
 export interface AIModel {
-  id: number;
-  categoryId: number;
+  id: string;
+  categoryId: string;
   name: string;
   version: string;
   description: string;

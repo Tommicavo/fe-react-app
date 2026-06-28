@@ -36,7 +36,7 @@
   "aimodels": [
     {
       "id": "1",
-      "categoryId": 1,
+      "categoryId": "1",
       "name": "Gemini",
       "version": "3.1 Pro",
       "description": "LLM model designed to read, understand, and generate human language.",
@@ -46,7 +46,7 @@
     },
     {
       "id": "2",
-      "categoryId": 2,
+      "categoryId": "2",
       "name": "YOLO",
       "version": "11.0",
       "description": "Real-time object detection AI model.",
@@ -56,7 +56,7 @@
     },
     {
       "id": "3",
-      "categoryId": 1,
+      "categoryId": "1",
       "name": "GPT-4o",
       "version": "2024-05-13",
       "description": "Multimodal LLM accepting any combination of text, audio, and image inputs.",
@@ -66,7 +66,7 @@
     },
     {
       "id": "4",
-      "categoryId": 1,
+      "categoryId": "1",
       "name": "Claude",
       "version": "3.5 Sonnet",
       "description": "State-of-the-art LLM featuring advanced reasoning, coding, and writing capabilities.",
@@ -76,7 +76,7 @@
     },
     {
       "id": "5",
-      "categoryId": 1,
+      "categoryId": "1",
       "name": "Llama 3",
       "version": "70B-Instruct",
       "description": "Open-access large language model optimized for dialogue and engineering use cases.",
@@ -86,7 +86,7 @@
     },
     {
       "id": "6",
-      "categoryId": 2,
+      "categoryId": "2",
       "name": "Stable Diffusion",
       "version": "3.0",
       "description": "Latent text-to-image diffusion model capable of generating photo-realistic images.",
@@ -96,7 +96,7 @@
     },
     {
       "id": "7",
-      "categoryId": 2,
+      "categoryId": "2",
       "name": "Midjourney",
       "version": "v6",
       "description": "Generative AI model focused on highly artistic and stylized image creation from text.",
@@ -106,7 +106,7 @@
     },
     {
       "id": "8",
-      "categoryId": 3,
+      "categoryId": "3",
       "name": "Whisper",
       "version": "v3",
       "description": "General-purpose speech recognition and transcription model trained on diverse audio.",
@@ -116,7 +116,7 @@
     },
     {
       "id": "9",
-      "categoryId": 4,
+      "categoryId": "4",
       "name": "AlphaFold",
       "version": "3.0",
       "description": "AI model that predicts the 3D structure of proteins and molecular complexes with high accuracy.",
@@ -126,7 +126,7 @@
     },
     {
       "id": "10",
-      "categoryId": 1,
+      "categoryId": "1",
       "name": "Mistral Large",
       "version": "2407",
       "description": "Top-tier open-weights text generation model with leading multilingual capacities.",
@@ -136,7 +136,7 @@
     },
     {
       "id": "11",
-      "categoryId": 1,
+      "categoryId": "1",
       "name": "DeepSeek-V3",
       "version": "3.0",
       "description": "Mixture-of-Experts (MoE) language model built for highly efficient web-scale inference.",
@@ -146,13 +146,24 @@
     },
     {
       "id": "12",
-      "categoryId": 5,
+      "categoryId": "5",
       "name": "Sora",
       "version": "1.0",
       "description": "Text-to-video AI model capable of generating complex scenes up to 60 seconds long.",
       "accuracy": 85,
       "creator": "OpenAI",
       "isActive": false
+    },
+    {
+      "categoryId": "3",
+      "name": "asd",
+      "version": "asd",
+      "description": "dsa",
+      "accuracy": 54,
+      "creator": "asd",
+      "isActive": true,
+      "id": "TP62Hdf6NoU"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

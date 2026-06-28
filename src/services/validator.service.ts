@@ -45,7 +45,7 @@ export const validatorService = {
       errors.creator = `Creator must be at most ${CREATOR_MAX} characters.`;
     }
 
-    if (!data.categoryId || data.categoryId === 0) {
+    if (!data.categoryId || data.categoryId === "") {
       errors.categoryId = "Please select a category.";
     }
 
@@ -75,7 +75,7 @@ export const validatorService = {
       name: "",
       version: "",
       creator: "",
-      categoryId: 0,
+      categoryId: "",
       accuracy: 0,
       description: "",
       isActive: true,

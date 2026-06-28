@@ -14,7 +14,7 @@ import "./AiModelDetailPage.scss";
 type Mode = "view" | "edit" | "create";
 
 const EMPTY_MODEL: AiModelFormData = {
-  categoryId: 0,
+  categoryId: "",
   name: "",
   version: "",
   description: "",
@@ -48,7 +48,7 @@ function AiModelDetailPage() {
       fetchCategories.then((r) => setCategories(r.data));
       return;
     }
-    Promise.all([aiModelService.getAiModelById(Number(id)), fetchCategories])
+    Promise.all([aiModelService.getAiModelById(id), fetchCategories])
       .then(([modelRes, catRes]) => {
         setModel(modelRes.data);
         setFormData({
@@ -66,10 +66,8 @@ function AiModelDetailPage() {
       .finally(() => setLoading(false));
   }, [id, isCreate]);
 
-  const categoryMap = new Map(categories.map((c) => [Number(c.id), c]));
-  const currentCategory = model
-    ? categoryMap.get(Number(model.categoryId))
-    : undefined;
+  const categoryMap = new Map(categories.map((c) => [String(c.id), c]));
+  const currentCategory = model ? categoryMap.get(model.categoryId) : undefined;
 
   const accuracyColor = (acc: number) =>
     acc >= 93 ? "success" : acc >= 87 ? "warning" : "danger";
@@ -83,7 +81,7 @@ function AiModelDetailPage() {
     const cast =
       type === "checkbox"
         ? (e.target as HTMLInputElement).checked
-        : name === "accuracy" || name === "categoryId"
+        : name === "accuracy"
           ? Number(value)
           : value;
 
@@ -117,10 +115,7 @@ function AiModelDetailPage() {
         setSuccessMsg("Model created successfully!");
         setTimeout(() => navigate("/"), 1200);
       } else {
-        const updated = await aiModelService.updateAiModel(
-          Number(id),
-          formData,
-        );
+        const updated = await aiModelService.updateAiModel(id, formData);
         setModel(updated.data);
         setMode("view");
         setSuccessMsg("Model updated successfully!");
@@ -136,7 +131,9 @@ function AiModelDetailPage() {
     if (!window.confirm("Delete this model? This action cannot be undone."))
       return;
     try {
-      await aiModelService.deleteAiModel(Number(id));
+      if (id != undefined) {
+        await aiModelService.deleteAiModel(id);
+      }
       navigate("/");
     } catch {
       setApiError("Failed to delete model.");

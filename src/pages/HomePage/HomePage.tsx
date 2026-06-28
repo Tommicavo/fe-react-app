@@ -58,7 +58,7 @@ function HomePage() {
   const [nameFilter, setNameFilter] = useState("");
   const [accuracyMin, setAccuracyMin] = useState<number | "">("");
   const [creatorFilter, setCreatorFilter] = useState("");
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const [nameSort, setNameSort] = useState<SortDir>(null);
@@ -85,11 +85,11 @@ function HomePage() {
   }, []);
 
   const categoryMap = useMemo(
-    () => new Map(categories.map((c) => [Number(c.id), c])),
+    () => new Map(categories.map((c) => [String(c.id), c])),
     [categories],
   );
 
-  const toggleCategory = (id: number) => {
+  const toggleCategory = (id: string) => {
     setSelectedCategoryIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
@@ -130,7 +130,7 @@ function HomePage() {
 
     if (selectedCategoryIds.length > 0)
       list = list.filter((m) =>
-        selectedCategoryIds.includes(Number(m.categoryId)),
+        selectedCategoryIds.includes(m.categoryId),
       );
 
     if (nameSort) {
@@ -154,8 +154,8 @@ function HomePage() {
     } else if (categorySort) {
       list.sort((a, b) =>
         categorySort === "asc"
-          ? Number(a.categoryId) - Number(b.categoryId)
-          : Number(b.categoryId) - Number(a.categoryId),
+          ? a.categoryId.localeCompare(b.categoryId)
+          : b.categoryId.localeCompare(a.categoryId),
       );
     }
 
@@ -294,8 +294,8 @@ function HomePage() {
                           <input
                             type="checkbox"
                             className="form-check-input mt-0"
-                            checked={selectedCategoryIds.includes(Number(cat.id))}
-                            onChange={() => toggleCategory(Number(cat.id))}
+                            checked={selectedCategoryIds.includes(String(cat.id))}
+                            onChange={() => toggleCategory(String(cat.id))}
                           />
                           {cat.label}
                         </label>
@@ -344,7 +344,7 @@ function HomePage() {
             <div key={model.id} className="col-12 col-sm-6 col-lg-4 col-xl-3">
               <AiModelCard
                 model={model}
-                category={categoryMap.get(Number(model.categoryId))}
+                category={categoryMap.get(model.categoryId)}
               />
             </div>
           ))}
