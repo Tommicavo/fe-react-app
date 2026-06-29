@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Check, X, Tag } from "lucide-react";
 import { categoryService } from "@/services/category.service";
+import { aiModelService } from "@/services/aiModel.service";
 import { categoryValidator } from "@/services/validators/category.validator";
 import type { Category, CategoryFormData } from "@/models/category.model";
 import "./AdminPage.scss";
@@ -109,9 +110,24 @@ function AdminPage() {
     }
   }
 
-  function startDelete(id: string) {
-    setDeletingId(id);
+  async function startDelete(id: string) {
     setEditingId(null);
+    setDeleteLoading(true);
+    try {
+      const { data: models } = await aiModelService.getAllAiModels();
+      const inUse = models.some((m) => m.categoryId === id);
+      if (inUse) {
+        setGlobalError(
+          "This category is assigned to one or more AI models and cannot be deleted.",
+        );
+        return;
+      }
+      setDeletingId(id);
+    } catch {
+      setGlobalError("Failed to check category usage.");
+    } finally {
+      setDeleteLoading(false);
+    }
   }
 
   async function confirmDelete(id: string) {
