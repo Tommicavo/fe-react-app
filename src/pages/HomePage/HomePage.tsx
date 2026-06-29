@@ -7,10 +7,9 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { aiModelService } from "@/services/aiModel.service";
-import { categoryService } from "@/services/category.service";
-import type { AIModel } from "@/models/aiModel.model";
-import type { Category } from "@/models/category.model";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchAllModels } from "@/store/slices/modelsSlice";
+import { fetchAllCategories } from "@/store/slices/categoriesSlice";
 import AiModelCard from "@/components/AiModelCard/AiModelCard";
 import "./HomePage.scss";
 
@@ -33,7 +32,6 @@ function SortBtn({
 }) {
   const AscIcon = numeric ? ArrowDown01 : ArrowDownAZ;
   const DescIcon = numeric ? ArrowUp01 : ArrowUpAZ;
-
   return (
     <button
       className={`btn btn-sm ${dir ? "btn-primary" : "btn-outline-secondary"}`}
@@ -47,13 +45,21 @@ function SortBtn({
   );
 }
 
+const PAGE_SIZE = 8;
+
 function HomePage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const [models, setModels] = useState<AIModel[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const models = useAppSelector((state) => state.models.list);
+  const modelsLoading = useAppSelector((state) => state.models.loading);
+  const modelsError = useAppSelector((state) => state.models.error);
+  const categories = useAppSelector((state) => state.categories.list);
+
+  useEffect(() => {
+    if (models.length === 0) dispatch(fetchAllModels());
+    if (categories.length === 0) dispatch(fetchAllCategories());
+  }, [dispatch, models.length, categories.length]);
 
   const [nameFilter, setNameFilter] = useState("");
   const [accuracyMin, setAccuracyMin] = useState<number | "">("");
@@ -66,23 +72,7 @@ function HomePage() {
   const [creatorSort, setCreatorSort] = useState<SortDir>(null);
   const [categorySort, setCategorySort] = useState<SortDir>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [modelsResponse, categoriesResponse] = await Promise.all([
-          aiModelService.getAllAiModels(),
-          categoryService.getAllCategories(),
-        ]);
-        setModels(modelsResponse.data);
-        setCategories(categoriesResponse.data);
-      } catch {
-        setError("Failed to load data. Make sure the JSON server is running.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const categoryMap = useMemo(
     () => new Map(categories.map((c) => [String(c.id), c])),
@@ -93,6 +83,7 @@ function HomePage() {
     setSelectedCategoryIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
+    setCurrentPage(1);
   };
 
   const clearFilters = () => {
@@ -104,6 +95,7 @@ function HomePage() {
     setAccuracySort(null);
     setCreatorSort(null);
     setCategorySort(null);
+    setCurrentPage(1);
   };
 
   const hasActiveFilters =
@@ -112,52 +104,46 @@ function HomePage() {
     creatorFilter ||
     selectedCategoryIds.length > 0;
 
-  const displayedModels = useMemo(() => {
+  const filteredModels = useMemo(() => {
     let list = [...models];
 
     if (nameFilter.trim())
       list = list.filter((m) =>
         m.name.toLowerCase().includes(nameFilter.toLowerCase().trim()),
       );
-
     if (accuracyMin !== "")
       list = list.filter((m) => m.accuracy >= Number(accuracyMin));
-
     if (creatorFilter.trim())
       list = list.filter((m) =>
         m.creator.toLowerCase().includes(creatorFilter.toLowerCase().trim()),
       );
-
     if (selectedCategoryIds.length > 0)
-      list = list.filter((m) =>
-        selectedCategoryIds.includes(m.categoryId),
-      );
+      list = list.filter((m) => selectedCategoryIds.includes(m.categoryId));
 
-    if (nameSort) {
+    if (nameSort)
       list.sort((a, b) =>
         nameSort === "asc"
           ? a.name.localeCompare(b.name)
           : b.name.localeCompare(a.name),
       );
-    } else if (accuracySort) {
+    else if (accuracySort)
       list.sort((a, b) =>
         accuracySort === "asc"
           ? a.accuracy - b.accuracy
           : b.accuracy - a.accuracy,
       );
-    } else if (creatorSort) {
+    else if (creatorSort)
       list.sort((a, b) =>
         creatorSort === "asc"
           ? a.creator.localeCompare(b.creator)
           : b.creator.localeCompare(a.creator),
       );
-    } else if (categorySort) {
+    else if (categorySort)
       list.sort((a, b) =>
         categorySort === "asc"
           ? a.categoryId.localeCompare(b.categoryId)
           : b.categoryId.localeCompare(a.categoryId),
       );
-    }
 
     return list;
   }, [
@@ -171,6 +157,20 @@ function HomePage() {
     creatorSort,
     categorySort,
   ]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredModels.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const pagedModels = filteredModels.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
+
+  const goToPage = (page: number) =>
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1);
+  }, [totalPages, currentPage]);
 
   return (
     <div className="home-page container-fluid py-3 px-3 px-md-4">
@@ -209,14 +209,20 @@ function HomePage() {
             <div className="input-group input-group-sm">
               <SortBtn
                 dir={nameSort}
-                onToggle={() => setNameSort(nextDir(nameSort))}
+                onToggle={() => {
+                  setNameSort(nextDir(nameSort));
+                  setCurrentPage(1);
+                }}
               />
               <input
                 type="text"
                 className="form-control"
                 placeholder="Search by name…"
                 value={nameFilter}
-                onChange={(e) => setNameFilter(e.target.value)}
+                onChange={(e) => {
+                  setNameFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
           </div>
@@ -227,7 +233,10 @@ function HomePage() {
             <div className="input-group input-group-sm">
               <SortBtn
                 dir={accuracySort}
-                onToggle={() => setAccuracySort(nextDir(accuracySort))}
+                onToggle={() => {
+                  setAccuracySort(nextDir(accuracySort));
+                  setCurrentPage(1);
+                }}
                 numeric
               />
               <input
@@ -237,11 +246,12 @@ function HomePage() {
                 min={0}
                 max={100}
                 value={accuracyMin}
-                onChange={(e) =>
+                onChange={(e) => {
                   setAccuracyMin(
                     e.target.value === "" ? "" : Number(e.target.value),
-                  )
-                }
+                  );
+                  setCurrentPage(1);
+                }}
               />
             </div>
           </div>
@@ -252,14 +262,20 @@ function HomePage() {
             <div className="input-group input-group-sm">
               <SortBtn
                 dir={creatorSort}
-                onToggle={() => setCreatorSort(nextDir(creatorSort))}
+                onToggle={() => {
+                  setCreatorSort(nextDir(creatorSort));
+                  setCurrentPage(1);
+                }}
               />
               <input
                 type="text"
                 className="form-control"
                 placeholder="Search by creator…"
                 value={creatorFilter}
-                onChange={(e) => setCreatorFilter(e.target.value)}
+                onChange={(e) => {
+                  setCreatorFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
               />
             </div>
           </div>
@@ -270,7 +286,10 @@ function HomePage() {
             <div className="input-group input-group-sm">
               <SortBtn
                 dir={categorySort}
-                onToggle={() => setCategorySort(nextDir(categorySort))}
+                onToggle={() => {
+                  setCategorySort(nextDir(categorySort));
+                  setCurrentPage(1);
+                }}
                 numeric
               />
               <div className="home-page__category-dropdown flex-grow-1 position-relative">
@@ -285,7 +304,6 @@ function HomePage() {
                   </span>
                   <span className="ms-1">▾</span>
                 </button>
-
                 {dropdownOpen && (
                   <ul className="home-page__category-menu dropdown-menu show">
                     {categories.map((cat) => (
@@ -294,7 +312,9 @@ function HomePage() {
                           <input
                             type="checkbox"
                             className="form-check-input mt-0"
-                            checked={selectedCategoryIds.includes(String(cat.id))}
+                            checked={selectedCategoryIds.includes(
+                              String(cat.id),
+                            )}
                             onChange={() => toggleCategory(String(cat.id))}
                           />
                           {cat.label}
@@ -310,14 +330,20 @@ function HomePage() {
       </div>
 
       {/* ── Results count ── */}
-      {!loading && !error && (
+      {!modelsLoading && !modelsError && (
         <p className="home-page__count small mb-3">
-          Showing <strong>{displayedModels.length}</strong> of{" "}
-          <strong>{models.length}</strong> models
+          Showing <strong>{pagedModels.length}</strong> of{" "}
+          <strong>{filteredModels.length}</strong> models
+          {filteredModels.length !== models.length && (
+            <>
+              {" "}
+              (filtered from <strong>{models.length}</strong> total)
+            </>
+          )}
         </p>
       )}
 
-      {loading && (
+      {modelsLoading && (
         <div className="d-flex justify-content-center py-5">
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading…</span>
@@ -325,22 +351,22 @@ function HomePage() {
         </div>
       )}
 
-      {error && (
+      {modelsError && (
         <div className="alert alert-danger" role="alert">
-          {error}
+          {modelsError}
         </div>
       )}
 
-      {!loading && !error && displayedModels.length === 0 && (
+      {!modelsLoading && !modelsError && filteredModels.length === 0 && (
         <div className="alert alert-warning" role="alert">
           No models match your current filters.
         </div>
       )}
 
       {/* ── Cards Grid ── */}
-      {!loading && !error && (
+      {!modelsLoading && !modelsError && (
         <div className="row g-3">
-          {displayedModels.map((model) => (
+          {pagedModels.map((model) => (
             <div key={model.id} className="col-12 col-sm-6 col-lg-4 col-xl-3">
               <AiModelCard
                 model={model}
@@ -349,6 +375,69 @@ function HomePage() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* ── Pagination ── */}
+      {!modelsLoading && !modelsError && totalPages > 1 && (
+        <nav
+          className="d-flex justify-content-center align-items-center gap-2 mt-4"
+          aria-label="Models pagination"
+        >
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => goToPage(1)}
+            disabled={safePage === 1}
+          >
+            «
+          </button>
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => goToPage(safePage - 1)}
+            disabled={safePage === 1}
+          >
+            ‹
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(
+              (p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1,
+            )
+            .reduce<(number | "...")[]>((acc, p, i, arr) => {
+              if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push("...");
+              acc.push(p);
+              return acc;
+            }, [])
+            .map((item, i) =>
+              item === "..." ? (
+                <span key={`ellipsis-${i}`} className="px-1 text-muted">
+                  …
+                </span>
+              ) : (
+                <button
+                  key={item}
+                  className={`btn btn-sm ${safePage === item ? "btn-primary" : "btn-outline-secondary"}`}
+                  onClick={() => goToPage(item as number)}
+                >
+                  {item}
+                </button>
+              ),
+            )}
+
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => goToPage(safePage + 1)}
+            disabled={safePage === totalPages}
+          >
+            ›
+          </button>
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => goToPage(totalPages)}
+            disabled={safePage === totalPages}
+          >
+            »
+          </button>
+        </nav>
       )}
     </div>
   );
