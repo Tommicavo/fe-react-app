@@ -1,49 +1,40 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Check, X, Tag } from "lucide-react";
-import { categoryService } from "@/services/category.service";
-import { aiModelService } from "@/services/aiModel.service";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  fetchAllCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "@/store/slices/categoriesSlice";
 import { categoryValidator } from "@/services/validators/category.validator";
-import type { Category, CategoryFormData } from "@/models/category.model";
+import type { CategoryFormData } from "@/models/category.model";
 import "./AdminPage.scss";
 
 const EMPTY_FORM: CategoryFormData = { label: "" };
 
 function AdminPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [globalError, setGlobalError] = useState("");
+  const dispatch = useAppDispatch();
 
-  // Create
+  const categories = useAppSelector((state) => state.categories.list);
+  const loading = useAppSelector((state) => state.categories.loading);
+  const globalError = useAppSelector((state) => state.categories.error);
+
   const [createForm, setCreateForm] = useState<CategoryFormData>(EMPTY_FORM);
   const [createError, setCreateError] = useState("");
   const [createLoading, setCreateLoading] = useState(false);
 
-  // Edit
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<CategoryFormData>(EMPTY_FORM);
   const [editError, setEditError] = useState("");
   const [editLoading, setEditLoading] = useState(false);
 
-  // Delete
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  async function fetchCategories() {
-    setLoading(true);
-    setGlobalError("");
-    try {
-      const { data } = await categoryService.getAllCategories();
-      setCategories(data);
-    } catch {
-      setGlobalError("Failed to load categories. Is the server running?");
-    } finally {
-      setLoading(false);
-    }
-  }
+    if (categories.length === 0) dispatch(fetchAllCategories());
+  }, [dispatch, categories.length]);
 
   function handleCreateChange(e: React.ChangeEvent<HTMLInputElement>) {
     setCreateForm({ label: e.target.value });
@@ -62,10 +53,9 @@ function AdminPage() {
     }
     setCreateLoading(true);
     try {
-      const { data } = await categoryService.insertCategory({
-        label: createForm.label.trim(),
-      });
-      setCategories((prev) => [...prev, data]);
+      await dispatch(
+        createCategory({ label: createForm.label.trim() }),
+      ).unwrap();
       setCreateForm(EMPTY_FORM);
     } catch {
       setCreateError("Failed to create category.");
@@ -74,11 +64,10 @@ function AdminPage() {
     }
   }
 
-  function startEdit(cat: Category) {
+  function startEdit(cat: { id: string; label: string }) {
     setEditingId(cat.id);
     setEditForm({ label: cat.label });
     setEditError("");
-    setDeletingId(null);
   }
 
   function cancelEdit() {
@@ -98,10 +87,9 @@ function AdminPage() {
     }
     setEditLoading(true);
     try {
-      const { data } = await categoryService.updateCategory(id, {
-        label: editForm.label.trim(),
-      });
-      setCategories((prev) => prev.map((c) => (c.id === id ? data : c)));
+      await dispatch(
+        updateCategory({ id, payload: { label: editForm.label.trim() } }),
+      ).unwrap();
       cancelEdit();
     } catch {
       setEditError("Failed to update category.");
@@ -110,34 +98,17 @@ function AdminPage() {
     }
   }
 
-  async function startDelete(id: string) {
-    setEditingId(null);
-    setDeleteLoading(true);
-    try {
-      const { data: models } = await aiModelService.getAllAiModels();
-      const inUse = models.some((m) => m.categoryId === id);
-      if (inUse) {
-        setGlobalError(
-          "This category is assigned to one or more AI models and cannot be deleted.",
-        );
-        return;
-      }
-      setDeletingId(id);
-    } catch {
-      setGlobalError("Failed to check category usage.");
-    } finally {
-      setDeleteLoading(false);
-    }
+  function startDelete(id: string) {
+    setDeletingId(id);
   }
 
   async function confirmDelete(id: string) {
     setDeleteLoading(true);
     try {
-      await categoryService.deleteCategory(id);
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+      await dispatch(deleteCategory(id)).unwrap();
       setDeletingId(null);
     } catch {
-      setGlobalError("Failed to delete category.");
+      // error in Redux state
     } finally {
       setDeleteLoading(false);
     }
@@ -191,21 +162,11 @@ function AdminPage() {
           </button>
         </form>
 
-        {/* Global error */}
+        {/* Global error from Redux */}
         {globalError && (
-          <div className="admin-alert admin-alert--danger">
-            {globalError}
-            <button
-              className="admin-alert__close"
-              onClick={() => setGlobalError("")}
-              aria-label="Dismiss"
-            >
-              <X size={14} />
-            </button>
-          </div>
+          <div className="admin-alert admin-alert--danger">{globalError}</div>
         )}
 
-        {/* List */}
         {loading ? (
           <div className="admin-loading">
             <span
@@ -222,7 +183,6 @@ function AdminPage() {
             {categories.map((cat) => (
               <li key={cat.id} className="admin-list__item">
                 {editingId === cat.id ? (
-                  // Edit row
                   <div className="admin-list__edit">
                     <div className="admin-list__edit-field">
                       <input
@@ -275,7 +235,6 @@ function AdminPage() {
                     </div>
                   </div>
                 ) : deletingId === cat.id ? (
-                  // Delete confirm row
                   <div className="admin-list__confirm">
                     <span className="admin-list__confirm-text">
                       Delete <strong>{cat.label}</strong>?
@@ -306,7 +265,6 @@ function AdminPage() {
                     </div>
                   </div>
                 ) : (
-                  // Normal row
                   <>
                     <span className="admin-list__label">{cat.label}</span>
                     <div className="admin-list__actions">

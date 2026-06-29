@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector } from "@/store/hooks";
 import type { ReactNode } from "react";
 
 interface Props {
@@ -7,7 +7,8 @@ interface Props {
 }
 
 function AdminGuard({ children }: Props) {
-  const { isLoggedIn, currentUser } = useAuth();
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const currentUser = useAppSelector((state) => state.auth.user);
 
   if (!isLoggedIn) return <Navigate to="/login" replace />;
   if (currentUser?.role !== "ADMIN") return <Navigate to="/" replace />;

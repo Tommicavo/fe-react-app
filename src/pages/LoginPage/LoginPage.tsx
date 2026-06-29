@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginSuccess } from "@/store/slices/authSlice";
 import { authService } from "@/services/auth.service";
 import {
   authValidator,
@@ -18,7 +19,9 @@ const EMPTY_FORM: AuthCredentials = { username: "", password: "" };
 const EMPTY_ERRORS: AuthValidationErrors = {};
 
 function LoginPage() {
-  const { isLoggedIn, login } = useAuth();
+  // Redux: read isLoggedIn to redirect if already authenticated
+  const dispatch = useAppDispatch();
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const navigate = useNavigate();
 
   const [mode, setMode] = useState<Mode>("login");
@@ -41,7 +44,6 @@ function LoginPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-
     if (errors[name as keyof AuthValidationErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -72,15 +74,13 @@ function LoginPage() {
           setServerError(result.error ?? "Login failed.");
           return;
         }
-        login(result.user);
+        // Dispatch to Redux store — authSlice saves to localStorage too
+        dispatch(loginSuccess(result.user));
         navigate("/", { replace: true });
       } else {
         const taken = await authService.isUsernameTaken(form.username.trim());
         if (taken) {
-          setErrors((prev) => ({
-            ...prev,
-            username: "Username is already taken.",
-          }));
+          setErrors((prev) => ({ ...prev, username: "Username is already taken." }));
           return;
         }
         const result = await authService.register(form);
@@ -88,7 +88,7 @@ function LoginPage() {
           setServerError(result.error ?? "Registration failed.");
           return;
         }
-        login(result.user);
+        dispatch(loginSuccess(result.user));
         navigate("/", { replace: true });
       }
     } catch {
@@ -108,7 +108,6 @@ function LoginPage() {
           {isLogin ? "Sign in to your account" : "Create a new account"}
         </p>
 
-        {/* Mode tabs */}
         <div className="login-page__tabs">
           <button
             type="button"
@@ -127,11 +126,8 @@ function LoginPage() {
         </div>
 
         <form className="login-page__form" onSubmit={handleSubmit} noValidate>
-          {/* Username */}
           <div className="login-page__field">
-            <label htmlFor="username" className="login-page__label">
-              Username
-            </label>
+            <label htmlFor="username" className="login-page__label">Username</label>
             <input
               id="username"
               name="username"
@@ -143,16 +139,11 @@ function LoginPage() {
               placeholder="Enter your username"
               disabled={loading}
             />
-            {errors.username && (
-              <div className="invalid-feedback">{errors.username}</div>
-            )}
+            {errors.username && <div className="invalid-feedback">{errors.username}</div>}
           </div>
 
-          {/* Password */}
           <div className="login-page__field">
-            <label htmlFor="password" className="login-page__label">
-              Password
-            </label>
+            <label htmlFor="password" className="login-page__label">Password</label>
             <input
               id="password"
               name="password"
@@ -161,14 +152,10 @@ function LoginPage() {
               className={`form-control${errors.password ? " is-invalid" : ""}`}
               value={form.password}
               onChange={handleChange}
-              placeholder={
-                isLogin ? "Enter your password" : "Create a strong password"
-              }
+              placeholder={isLogin ? "Enter your password" : "Create a strong password"}
               disabled={loading}
             />
-            {errors.password && (
-              <div className="invalid-feedback">{errors.password}</div>
-            )}
+            {errors.password && <div className="invalid-feedback">{errors.password}</div>}
             {!isLogin && !errors.password && (
               <div className="login-page__hint">
                 Min. 8 chars · 1 uppercase · 1 lowercase · 1 number · 1 symbol
@@ -176,10 +163,7 @@ function LoginPage() {
             )}
           </div>
 
-          {/* Server error */}
-          {serverError && (
-            <div className="login-page__server-error">{serverError}</div>
-          )}
+          {serverError && <div className="login-page__server-error">{serverError}</div>}
 
           <button
             type="submit"
@@ -188,18 +172,10 @@ function LoginPage() {
           >
             {loading ? (
               <>
-                <span
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                  aria-hidden="true"
-                />
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
                 {isLogin ? "Signing in…" : "Creating account…"}
               </>
-            ) : isLogin ? (
-              "Sign In"
-            ) : (
-              "Create Account"
-            )}
+            ) : isLogin ? "Sign In" : "Create Account"}
           </button>
         </form>
       </div>

@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { aiModelService } from "@/services/aiModel.service";
-import { categoryService } from "@/services/category.service";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  createModel,
+  updateModel,
+  deleteModel,
+} from "@/store/slices/modelsSlice";
 import {
   aiModelValidator,
   type AiModelFormData,
   type AiModelValidationErrors,
 } from "@/services/validators/aiModel.validator";
 import type { AIModel } from "@/models/aiModel.model";
-import type { Category } from "@/models/category.model";
 import "./AiModelDetailPage.scss";
 
 type Mode = "view" | "edit" | "create";
@@ -30,9 +34,12 @@ function AiModelDetailPage() {
   const isCreate = !id;
   const [mode, setMode] = useState<Mode>(isCreate ? "create" : "view");
 
+  const dispatch = useAppDispatch();
+
+  const categories = useAppSelector((state) => state.categories.list);
+
   const [model, setModel] = useState<AIModel | null>(null);
   const [formData, setFormData] = useState<AiModelFormData>(EMPTY_MODEL);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(!isCreate);
   const [saving, setSaving] = useState(false);
 
@@ -43,13 +50,10 @@ function AiModelDetailPage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCategories = categoryService.getAllCategories();
-    if (isCreate) {
-      fetchCategories.then((r) => setCategories(r.data));
-      return;
-    }
-    Promise.all([aiModelService.getAiModelById(id), fetchCategories])
-      .then(([modelRes, catRes]) => {
+    if (isCreate) return;
+    aiModelService
+      .getAiModelById(id)
+      .then((modelRes) => {
         setModel(modelRes.data);
         setFormData({
           categoryId: modelRes.data.categoryId,
@@ -60,7 +64,6 @@ function AiModelDetailPage() {
           creator: modelRes.data.creator,
           isActive: modelRes.data.isActive,
         });
-        setCategories(catRes.data);
       })
       .catch(() => setApiError("Failed to load model data."))
       .finally(() => setLoading(false));
@@ -111,12 +114,14 @@ function AiModelDetailPage() {
     setSaving(true);
     try {
       if (isCreate) {
-        await aiModelService.insertAiModel(formData);
+        await dispatch(createModel(formData)).unwrap();
         setSuccessMsg("Model created successfully!");
         setTimeout(() => navigate("/"), 1200);
       } else {
-        const updated = await aiModelService.updateAiModel(id, formData);
-        setModel(updated.data);
+        const result = await dispatch(
+          updateModel({ id, payload: formData }),
+        ).unwrap();
+        setModel(result);
         setMode("view");
         setSuccessMsg("Model updated successfully!");
       }
@@ -132,7 +137,7 @@ function AiModelDetailPage() {
       return;
     try {
       if (id != undefined) {
-        await aiModelService.deleteAiModel(id);
+        await dispatch(deleteModel(id)).unwrap();
       }
       navigate("/");
     } catch {

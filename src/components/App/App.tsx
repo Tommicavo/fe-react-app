@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Outlet, Navigate, NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logoutUser } from "@/store/slices/authSlice";
 import { Home, LockKeyhole, Settings, LogOut } from "lucide-react";
 import "./App.scss";
 
 function App() {
-  const { isLoggedIn, currentUser, logout } = useAuth();
+  const dispatch = useAppDispatch();
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const currentUser = useAppSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -17,7 +20,7 @@ function App() {
   const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = () => {
-    logout();
+    dispatch(logoutUser());
     navigate("/login", { replace: true });
   };
 
