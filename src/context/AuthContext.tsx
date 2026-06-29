@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { User } from "@/models/user.model";
+
+const STORAGE_KEY = "auth_user";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -11,17 +13,31 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? (JSON.parse(stored) as User) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const isLoggedIn = currentUser !== null;
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [currentUser]);
 
   const login = (user: User) => {
     setCurrentUser(user);
-    setIsLoggedIn(true);
   };
 
   const logout = () => {
     setCurrentUser(null);
-    setIsLoggedIn(false);
   };
 
   return (
