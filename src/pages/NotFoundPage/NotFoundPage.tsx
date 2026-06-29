@@ -1,14 +1,31 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Home, SearchX } from "lucide-react";
+import "./NotFoundPage.scss";
 
 function NotFoundPage() {
+  const navigate = useNavigate();
+
   return (
-    <div className="container mt-5 text-center">
-      <h1>404</h1>
-      <h2>Page Not Found</h2>
-      <div>It seems like the page you are looking for is not here</div>
-      <Link to="/" className="btn btn-primary">
-        Back to Home Page
-      </Link>
+    <div className="not-found">
+      <div className="not-found__code" aria-hidden="true">
+        404
+      </div>
+
+      <div className="not-found__icon">
+        <SearchX size={48} strokeWidth={1.5} />
+      </div>
+
+      <h1 className="not-found__title">Page not found</h1>
+      <p className="not-found__desc">
+        The page you're looking for doesn't exist or has been moved.
+        <br className="not-found__br" />
+        Check the URL or head back to the catalogue.
+      </p>
+
+      <button className="not-found__btn" onClick={() => navigate("/")}>
+        <Home size={18} />
+        Back to catalogue
+      </button>
     </div>
   );
 }
